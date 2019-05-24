@@ -30,7 +30,7 @@ class ManageController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['dash', 'statistic', 'widget-frame', 'widget-inline', 'config', 'channels', 'start', 'start-test'],
+                        'actions' => ['dash', 'statistic', 'widget-frame', 'widget-multi', 'config', 'channels', 'start', 'start-test'],
                         'allow' => true,
                         'roles' => ['user'],
                     ],
@@ -95,16 +95,16 @@ class ManageController extends Controller
     }
 
     /**
-     * Widget Inline. MultiLanding
+     * Widget Multi. MultiLanding
      * @param $id
      * @return mixed
      * @throws
      */
-    public function actionWidgetInline($id)
+    public function actionWidgetMulti($id)
     {
         $project = $this->findModelProject($id);
         $this->view->params['project'] = $project;
-        return $this->render('widget-inline', [
+        return $this->render('widget-multi', [
             'project' => $project
         ]);
     }

@@ -16,6 +16,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int $enable
  * @property int $debug
  * @property string $screenShot  null - not available; frame - iframe available; url - image name
+ * @property integer $wMultiStatus
  *
  * @property int $default_widget_id
  * @property User $user
@@ -94,6 +95,37 @@ class Project extends \yii\db\ActiveRecord
             return true;
         else
             return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWidgetMultiEnable()
+    {
+        if ($this->wMultiStatus==self::STATUS_ENABLED)
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * Enable widget
+     * @return bool
+     */
+    public function wMultiTurnOn()
+    {
+        $this->wMultiStatus = self::STATUS_ENABLED;
+        return $this->save();
+    }
+
+    /**
+     * Disable widget
+     * @return bool
+     */
+    public function wMultiTurnOff()
+    {
+        $this->enable = self::STATUS_DISABLED;
+        return $this->save();
     }
 
     /**

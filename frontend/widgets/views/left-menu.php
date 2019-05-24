@@ -23,10 +23,10 @@ $menu = [
 
     ],
     [
-        'label' => '<i class="material-icons left">desktop_windows</i>Виджет',
+        'label' => '<i class="material-icons left">desktop_windows</i>Виджеты',
         'items' => [
             ['label' => 'Фрейм', 'url' => ['manage/widget-frame', 'id' => $model->id]],
-            ['label' => 'Мульти', 'url' => ['manage/widget-inline', 'id' => $model->id]],
+            ['label' => 'Мульти', 'url' => ['manage/widget-multi', 'id' => $model->id]],
         ],
     ],
 

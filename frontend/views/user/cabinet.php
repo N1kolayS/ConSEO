@@ -16,7 +16,6 @@ $this->title = 'Мой кабинет';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-
 <div class="col s12">
     <div class="card ui-app__page-content">
 
@@ -25,10 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="card-body">
                 <h3>Добро пожаловать <?=$model->username?></h3>
 
-
             </div>
         </div>
     </div>
-
-
 </div>

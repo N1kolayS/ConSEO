@@ -11,6 +11,7 @@ namespace frontend\controllers;
 
 use common\models\Channel;
 use common\models\Domain;
+use common\models\WidgetFrame;
 use Yii;
 
 use yii\web\Controller;
@@ -44,7 +45,7 @@ class AjaxController extends Controller
                         'roles' => ['user'],
                     ],
                     [
-                        'actions' => ['demo-site', 'visit-viewed', 'visit-phone', 'channel-add-new'],
+                        'actions' => ['demo-site', 'visit-viewed', 'visit-phone', 'channel-add-new', 'widget-frame'],
                         'allow' => true,
                         'roles' => ['?', '@'], // Guest User
                     ],
@@ -52,6 +53,27 @@ class AjaxController extends Controller
                 ],
             ],
         ];
+    }
+
+    /**
+     * Добавляем новый канал
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionChannelAddNew($id)
+    {
+        if (Yii::$app->request->isAjax) {
+
+            $project = $this->findModelProject($id);
+            $channel = new Channel();
+            $channel->project_id = $project->id;
+            if ($channel->save())
+                return Json::encode(['result'=> true, 'id' => $channel->id]);
+            else
+                return Json::encode(['result'=> false, 'error' => 10]);
+
+        }
     }
 
     /**
@@ -100,17 +122,25 @@ class AjaxController extends Controller
      * @return string
      * @throws NotFoundHttpException
      */
-    public function actionChannelAddNew($id)
+    public function actionWidgetFrame($id)
     {
         if (Yii::$app->request->isAjax) {
+            $widget = $this->findModelWidgetFrame($id);
+            $status = Yii::$app->getRequest()->getQueryParam('status');
+            $result = '';
+            if ($status!==null)
+            {
+                if ($status==1)
+                {
+                    $result = $widget->TurnOn();
+                }
+                else {
+                    $result = $widget->TurnOff();
 
-            $project = $this->findModelProject($id);
-            $channel = new Channel();
-            $channel->project_id = $project->id;
-            if ($channel->save())
-                return Json::encode(['result'=> true, 'id' => $channel->id]);
-            else
-                return Json::encode(['result'=> false, 'error' => 10]);
+                }
+
+            }
+            return Json::encode(['result'=> $result]);
 
         }
     }
@@ -125,6 +155,22 @@ class AjaxController extends Controller
     protected function findModelProject($id)
     {
         if (($model = Project::findOneByUser($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('Проект не найден.');
+        }
+    }
+
+    /**
+     * Find widget by primary key with condition, widget belong authorized user
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return WidgetFrame the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModelWidgetFrame($id)
+    {
+        if (($model = WidgetFrame::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('Проект не найден.');

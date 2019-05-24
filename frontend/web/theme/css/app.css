@@ -1492,3 +1492,9 @@ Custom
     text-decoration: none;
     border-bottom: dashed 1px #df4124;
 }
+
+/* Fade overlay */
+.disable-block {
+    opacity: 0.3;
+    background: #000;
+}

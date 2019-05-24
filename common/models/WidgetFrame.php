@@ -35,6 +35,9 @@ class WidgetFrame extends \yii\db\ActiveRecord
     const POSITION_RIGHT_MIDDLE = 5;
     const POSITION_RIGHT_BOTTOM = 6;
 
+    const ENABLE = 1;
+    const DISABLE = 0;
+
     /**
      * Список позиций.
      * Используется в настройках оформления _decor.php
@@ -109,6 +112,37 @@ class WidgetFrame extends \yii\db\ActiveRecord
             return true;
         else
             return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnable()
+    {
+        if ($this->enable===self::ENABLE)
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * Enable widget
+     * @return bool
+     */
+    public function TurnOn()
+    {
+        $this->enable = self::ENABLE;
+        return $this->save();
+    }
+
+    /**
+     * Disable widget
+     * @return bool
+     */
+    public function TurnOff()
+    {
+        $this->enable = 0;
+        return $this->save();
     }
 
     /**

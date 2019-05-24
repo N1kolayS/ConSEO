@@ -10,6 +10,7 @@ namespace console\controllers;
 
 use common\models\Domain;
 use common\models\Visit;
+use common\models\WidgetFrame;
 use Yii;
 use yii\console\Controller;
 
@@ -39,4 +40,10 @@ class TestController extends Controller
     }
 
 
+    public function actionWidget($id)
+    {
+        $widget = WidgetFrame::findOne($id);
+        $widget->enable = 0;
+        $widget->save();
+    }
 }
