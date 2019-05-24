@@ -9,6 +9,7 @@
 namespace frontend\controllers;
 
 use common\models\MapReferral;
+use common\models\Position;
 use common\models\Project;
 use Yii;
 use yii\web\Controller;
@@ -104,8 +105,16 @@ class ManageController extends Controller
     {
         $project = $this->findModelProject($id);
         $this->view->params['project'] = $project;
+        $position = new Position();
+        $position->project_id = $id;
+
+        if ($position->load(Yii::$app->request->post()) && $position->save()) {
+            return $this->refresh();
+        }
+
         return $this->render('widget-multi', [
-            'project' => $project
+            'project' => $project,
+            'position' => $position
         ]);
     }
 

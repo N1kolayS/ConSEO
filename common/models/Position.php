@@ -16,6 +16,7 @@ use Yii;
  * @property ChannelPosition[] $channelPositions
  * @property Channel[] $channels
  * @property Project $project
+ * @property array $matrix
  */
 class Position extends \yii\db\ActiveRecord
 {
@@ -33,7 +34,7 @@ class Position extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['project_id'], 'required'],
+            [['project_id', 'name', 'htmlId'], 'required'],
             [['project_id'], 'integer'],
             [['name', 'htmlId', 'htmlClass'], 'string', 'max' => 255],
             [['project_id'], 'exist', 'skipOnError' => true, 'targetClass' => Project::className(), 'targetAttribute' => ['project_id' => 'id']],
@@ -76,5 +77,34 @@ class Position extends \yii\db\ActiveRecord
     public function getProject()
     {
         return $this->hasOne(Project::className(), ['id' => 'project_id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getMatrix()
+    {
+        $data = [];
+        foreach ($this->project->channels as $channel)
+        {
+            foreach ($this->project->positions as $position)
+            {
+                $ChannelPosition = ChannelPosition::find()->where(['channel_id' => $channel->id, 'position_id' => $position->id])->one();
+                if ($ChannelPosition)
+                    $data[$channel->id][$position->id] = $ChannelPosition;
+                else
+                    $data[$channel->id][$position->id] =  null;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * @param $channel_id
+     * @param $position_id
+     */
+    public static function showValue($channel_id, $position_id)
+    {
+        ChannelPosition::find()->where(['channel_id' => $channel_id, 'position_id' => $position_id])->one();
     }
 }

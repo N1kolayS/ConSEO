@@ -24,6 +24,8 @@ use yii\behaviors\TimestampBehavior;
  * @property Channel[] $channels
  * @property Channel[] $channelsEnable
  * @property Channel $defaultChannel
+ * @property Position[] $positions
+ *
  */
 class Project extends \yii\db\ActiveRecord
 {
@@ -124,7 +126,7 @@ class Project extends \yii\db\ActiveRecord
      */
     public function wMultiTurnOff()
     {
-        $this->enable = self::STATUS_DISABLED;
+        $this->wMultiStatus = self::STATUS_DISABLED;
         return $this->save();
     }
 
@@ -163,6 +165,14 @@ class Project extends \yii\db\ActiveRecord
     }
 
     /**
+     * Positions[]
+     * @return \yii\db\ActiveQuery| null
+     */
+    public function getPositions()
+    {
+        return $this->hasMany(Position::className(), ['project_id' => 'id']);
+    }
+    /**
      * @param $id
      * @return Project
      */
@@ -171,19 +181,7 @@ class Project extends \yii\db\ActiveRecord
         return self::findOne(['id' => $id, 'user_id'=>Yii::$app->user->id]);
     }
 
-    /**
-     * @return bool
-     */
-    public function isEnableWidget() {
-        return true;
-    }
 
-    /**
-     * @return bool
-     */
-    public function isEnableMulti() {
-        return false;
-    }
     /**
      * @return WidgetFrame|null
      */

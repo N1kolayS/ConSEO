@@ -37,15 +37,13 @@ class AjaxController extends Controller
 
                     [
                         'actions' => [
-
                             'check-domain',
-
                         ],
                         'allow' => true,
                         'roles' => ['user'],
                     ],
                     [
-                        'actions' => ['demo-site', 'visit-viewed', 'visit-phone', 'channel-add-new', 'widget-frame'],
+                        'actions' => ['demo-site', 'visit-viewed', 'visit-phone', 'channel-add-new', 'widget-frame', 'widget-multi'],
                         'allow' => true,
                         'roles' => ['?', '@'], // Guest User
                     ],
@@ -74,6 +72,7 @@ class AjaxController extends Controller
                 return Json::encode(['result'=> false, 'error' => 10]);
 
         }
+        return Json::encode(['result'=> false, 'error' => 404]);
     }
 
     /**
@@ -117,7 +116,7 @@ class AjaxController extends Controller
     }
 
     /**
-     * Добавляем новый канал
+     * Статус виджета
      * @param $id
      * @return string
      * @throws NotFoundHttpException
@@ -144,6 +143,37 @@ class AjaxController extends Controller
 
         }
     }
+
+    /**
+     * Статус виджета Multi
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionWidgetMulti($id)
+    {
+        if (Yii::$app->request->isAjax) {
+            $project = $this->findModelProject($id);
+            $status = Yii::$app->getRequest()->getQueryParam('status');
+            $result = '';
+            if ($status!==null)
+            {
+                if ($status==1)
+                {
+                    $result = $project->wMultiTurnOn();
+                }
+                else {
+                    $result = $project->wMultiTurnOff();
+
+                }
+
+            }
+            return Json::encode(['result'=> $result]);
+
+        }
+    }
+
+
 
     /**
      * Find project by primary key with condition, project belong authorized user
