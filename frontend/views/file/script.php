@@ -14,6 +14,7 @@
 /* @var $mobile  */
 
 use yii\helpers\Url;
+use yii\helpers\Json;
 
 ?>
 
@@ -33,27 +34,25 @@ use yii\helpers\Url;
                         if ($channel->utm_campaign!==null){
                             foreach (explode(',', $channel->utm_campaign) as $campaign)
                             {
-                                echo "list_utm_campaign['". trim($campaign). "'] = '$channel->code';".PHP_EOL ;
+                                echo "list_utm_campaign['". trim($campaign). "'] = '$channel->id';".PHP_EOL ;
                             }
                         }
                         if ($channel->utm_source!==null)
                         {
                             foreach (explode(',', $channel->utm_source) as $source)
                             {
-                                echo "list_utm_source['". trim($source). "'] = '$channel->code';".PHP_EOL ;
+                                echo "list_utm_source['". trim($source). "'] = '$channel->id';".PHP_EOL ;
                             }
                         }
                         if ($channel->referral!==null)
                         {
                             foreach (explode(',', $channel->referral) as $referral)
                             {
-                                echo "list_referral['". trim($referral). "'] = '$channel->code';".PHP_EOL ;
+                                echo "list_referral['". trim($referral). "'] = '$channel->id';".PHP_EOL ;
                             }
                         }
                     }
                     ?>
-
-
 
                 let channel = '<?=$model->defaultChannel->id?>';
                 let channel_campaign = false;
@@ -121,6 +120,8 @@ use yii\helpers\Url;
                     channel = channel_campaign;
                 }
 
+//console.log(channel);
+
                 request = this.sendAjaxUtm("url="+encodeURIComponent(url)
                     +"&key="+encodeURIComponent(this.access_key)
                     +"&channel_id="+encodeURIComponent(channel)
@@ -139,21 +140,19 @@ use yii\helpers\Url;
                                 expires: <?=$lifetime?>,
                                 path: '/'
                             });
-                            <?php if ($model->isEnableWidget()) {  ?>
+                            <?php if ($model->isWidgetFrameEnable()) {  ?>
                             //Check if Default and Disable default
                             conseo_promo.render(id,channel, reqdata.cookie );
                             <?php }  ?>
 
-                            <?php if ($model->isEnableMulti()) {  ?>
-                            conseo_promo.multi(channel, reqdata.cookie );
+                            <?php if ($model->isWidgetMultiEnable()) {  ?>
+                            //conseo_promo.multi(channel, reqdata.cookie );
                             conseo_promo.multiHead(channel, params);
                             <?php }  ?>
                         }
                     }
                     return false;
                 };
-
-
 
             }
             else { console.log('The specified block id="'+id+'" is missing'); }
@@ -224,4 +223,27 @@ use yii\helpers\Url;
 
         },
 
-    };
+        multiHead: function (channel_id, params) {
+            <?php
+            foreach ($model->positions as $position) {
+
+                if ($position->listValueByChannel())
+                {
+                ?>
+                let elem<?=$position->id?> = <?=Json::encode($position->listValueByChannel())?>;
+                if (document.getElementById("<?=$position->htmlId?>")!==null)
+                {
+                    if ((elem<?=$position->id?>[channel_id]!==undefined)&&(elem<?=$position->id?>[channel_id]!==null)) {
+
+                            let result_val<?=$position->id?> = (params['utm_term']!==undefined) ? elem<?=$position->id?>[channel_id].replace("{keyword}", decodeURI(params['utm_term']) ) : elem<?=$position->id?>[channel_id].replace("{keyword}", "" );
+                            document.getElementById("<?=$position->htmlId?>").innerHTML =result_val<?=$position->id?>;
+                    }
+                }
+                <?php
+                echo PHP_EOL;
+                }
+            }
+            ?>
+        }
+
+};

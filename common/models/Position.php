@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "position".
@@ -100,11 +101,41 @@ class Position extends \yii\db\ActiveRecord
     }
 
     /**
+     * All val for selected position by Channel
+     * @return array
+     */
+    public function listValueByChannel()
+    {
+        if ($this->channelPositions)
+            return ArrayHelper::map($this->channelPositions, 'channel_id', 'val');
+        else
+            return null;
+    }
+
+    /**
      * @param $channel_id
      * @param $position_id
+     * @return string | null
      */
     public static function showValue($channel_id, $position_id)
     {
-        ChannelPosition::find()->where(['channel_id' => $channel_id, 'position_id' => $position_id])->one();
+        $model = ChannelPosition::find()->where(['channel_id' => $channel_id, 'position_id' => $position_id])->one();
+        if ($model)
+            return $model->val;
+        else
+            return null;
+    }
+
+    /**
+     * @param $id
+     * @return Position | null
+     */
+    public static function findOneByUser($id)
+    {
+        $model = self::findOne($id);
+        if (($model)&&($model->project->user_id == Yii::$app->user->id))
+            return $model;
+        else
+            return null;
     }
 }

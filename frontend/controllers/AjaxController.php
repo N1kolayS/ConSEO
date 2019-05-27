@@ -10,7 +10,9 @@ namespace frontend\controllers;
 
 
 use common\models\Channel;
+use common\models\ChannelPosition;
 use common\models\Domain;
+use common\models\Position;
 use common\models\WidgetFrame;
 use Yii;
 
@@ -43,7 +45,7 @@ class AjaxController extends Controller
                         'roles' => ['user'],
                     ],
                     [
-                        'actions' => ['demo-site', 'visit-viewed', 'visit-phone', 'channel-add-new', 'widget-frame', 'widget-multi'],
+                        'actions' => ['demo-site', 'visit-viewed', 'visit-phone', 'channel-add-new', 'widget-frame', 'widget-multi', 'save-val'],
                         'allow' => true,
                         'roles' => ['?', '@'], // Guest User
                     ],
@@ -142,6 +144,39 @@ class AjaxController extends Controller
             return Json::encode(['result'=> $result]);
 
         }
+    }
+
+    /**
+     * Сохраняем значение в матрицу позиций\каналов
+     *
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionSaveVal()
+    {
+        if (Yii::$app->request->isAjax) {
+
+
+            $channel = Channel::findOneByUser(intval(Yii::$app->getRequest()->getQueryParam('channel_id')));
+            $position = Position::findOneByUser(intval(Yii::$app->getRequest()->getQueryParam('position_id')));
+            $val = Yii::$app->getRequest()->getQueryParam('value');
+            if ($channel&&$position&&($val!==null))
+            {
+                $channelPosition = ChannelPosition::findOne(['channel_id'=>$channel->id, 'position_id' => $position->id]);
+                if ($channelPosition==null)
+                {
+                    $channelPosition = new ChannelPosition();
+                    $channelPosition->channel_id = $channel->id;
+                    $channelPosition->position_id = $position->id;
+                }
+                $channelPosition->val = $val;
+                $channelPosition->save();
+            }
+
+            return Json::encode(['result'=> true]);
+
+        }
+        return Json::encode(['result'=> false]);
     }
 
     /**

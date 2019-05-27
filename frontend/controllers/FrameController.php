@@ -57,6 +57,25 @@ class FrameController extends Controller
     }
 
     /**
+     * Production
+     * @param $id - widget_id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionProd($id)
+    {
+
+        $this->layout = 'frame';
+        $widget = $this->findWidget($id);
+        $widget->mobile = Yii::$app->getRequest()->getQueryParam('mobile');
+        $widget->code = Yii::$app->getRequest()->getQueryParam('channel');
+
+        return $this->render('demo', [
+            'widget' => $widget,
+        ]);
+    }
+
+    /**
      * Finds the Default Widgets by Project id
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id

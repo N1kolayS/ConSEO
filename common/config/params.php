@@ -10,7 +10,7 @@ return [
         [
             'name' => 'Прямой заход',
             'code' => '111',
-            'default' => true,
+            'default' => 1,
         ],
         [
             'name' => 'Google Поиск',

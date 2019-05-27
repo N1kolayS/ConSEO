@@ -131,6 +131,22 @@ class Project extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return bool
+     */
+    public function isWidgetFrameEnable()
+    {
+        if ($this->findDefaultWidget())
+        {
+            return $this->findDefaultWidget()->isEnable();
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getUser()
