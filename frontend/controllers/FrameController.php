@@ -9,7 +9,9 @@
 namespace frontend\controllers;
 
 
+use common\models\Channel;
 use common\models\Project;
+use common\models\Visit;
 use common\models\WidgetFrame;
 use Yii;
 
@@ -53,6 +55,7 @@ class FrameController extends Controller
         $widget->mobile = false;
         return $this->render('demo', [
             'widget' => $widget,
+            'visit' => false
         ]);
     }
 
@@ -67,12 +70,29 @@ class FrameController extends Controller
 
         $this->layout = 'frame';
         $widget = $this->findWidget($id);
-        $widget->mobile = Yii::$app->getRequest()->getQueryParam('mobile');
-        $widget->code = Yii::$app->getRequest()->getQueryParam('channel');
+        $request =  Yii::$app->getRequest();
+        $visit = Visit::findByCookieAndChannel($request->getQueryParam('cookie'), $request->getQueryParam('channel'));
+        $channel = Channel::findOne( $request->getQueryParam('channel'));
+        if ($channel)
+        {
+            $widget->mobile = $request->getQueryParam('mobile');
+            $widget->code = $channel->code;
 
-        return $this->render('demo', [
-            'widget' => $widget,
-        ]);
+            return $this->render('demo', [
+                'widget' => $widget,
+                'visit' => $visit
+            ]);
+        }
+        else
+        {
+            $widget->mobile = $request->getQueryParam('mobile');
+            return $this->render('demo', [
+                'widget' => $widget,
+                'visit' => false
+            ]);
+        }
+
+
     }
 
     /**

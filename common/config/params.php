@@ -5,7 +5,7 @@ return [
     'user.passwordResetTokenExpire' => 3600,
 
     'screenshots1200.url' => 'http://mini.s-shot.ru/1200x768/jpeg/1200/Z100/?',
-
+    'urlHostWidget' => 'https://con-seo.ru',
     'map.start' => [
         [
             'name' => 'Прямой заход',

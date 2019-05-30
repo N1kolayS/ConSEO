@@ -53,7 +53,11 @@ use yii\helpers\Json;
                         }
                     }
                     ?>
-
+                // Generate uniqe cookie, on client side
+                let uid = function () {
+                    let now = new Date();
+                    return '_' + Math.random().toString(36).substr(2, 9)+now.getTime();
+                };
                 let channel = '<?=$model->defaultChannel->id?>';
                 let channel_campaign = false;
                 let channel_source   = false;
@@ -121,16 +125,17 @@ use yii\helpers\Json;
                 }
 
 //console.log(channel);
-
+/*
                 request = this.sendAjaxUtm("url="+encodeURIComponent(url)
                     +"&key="+encodeURIComponent(this.access_key)
                     +"&channel_id="+encodeURIComponent(channel)
                     +"&ref="+encodeURIComponent(ref)
                     +"&browser="+encodeURIComponent(navigator.userAgent)
                     +"&ip="+encodeURIComponent('<?=$ip?>')
-                    +"&mobile="+encodeURIComponent('<?= ($widget->mobile) ? 1 : 0 ?>')
+                    +"&mobile="+encodeURIComponent('<?=($widget->mobile) ? 1 : 0 ?>')
                     +"&cookie="+encodeURIComponent(conseo_promo.getCookie('conseo')));
 
+                /*
                 request.onreadystatechange=function() {
                     if (this.readyState===4) {
                         if(this.status===200) {
@@ -153,6 +158,37 @@ use yii\helpers\Json;
                     }
                     return false;
                 };
+                */
+                // Check cookie, if not found, generate new and set
+                let cook = conseo_promo.getCookie('conseo');
+                if ((cook==null)||(cook.length<8))
+                {
+                    cook = uid();
+                    conseo_promo.setCookie('conseo',cook, {
+                        expires: <?=$lifetime?>,
+                        path: '/'
+                    });
+                }
+
+                let data = new FormData();
+                data.append('url', url);
+                data.append('channel_id', channel);
+                data.append('ref', ref);
+                data.append('browser', navigator.userAgent);
+                data.append('ip', '<?=$ip?>');
+                data.append('mobile', <?= ($widget->mobile) ? 1 : 0 ?>);
+                data.append('cookie', cook);
+                let result = navigator.sendBeacon('<?=Url::to(['collector/beacon', 'id' => $model->id], true)?>', data);
+
+                <?php if ($model->isWidgetFrameEnable()) {  ?>
+                //Check if Default and Disable default
+                conseo_promo.render(id,channel,cook );
+                <?php }  ?>
+
+                <?php if ($model->isWidgetMultiEnable()) {  ?>
+                //conseo_promo.multi(channel, reqdata.cookie );
+                conseo_promo.multiHead(channel, params);
+                <?php }  ?>
 
             }
             else { console.log('The specified block id="'+id+'" is missing'); }
@@ -164,7 +200,7 @@ use yii\helpers\Json;
         {
             const XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest; // Check IE or Browser
             const xhr = new XHR();
-            xhr.open('POST', '<?=Url::to(['xajax/visit', 'id' => $model->id], true)?>', true);
+            xhr.open('POST', '<?=Url::to(['collector/visit', 'id' => $model->id], true)?>', true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             xhr.send(data);
@@ -198,7 +234,7 @@ use yii\helpers\Json;
         },
 
         render: function (id, channel, cookie) {
-            <?php if ($widget->mobile) : // Render Moblie Iframe  ?>
+            <?php if ($widget->mobile) : // Render Mobile Iframe  ?>
 
             document.getElementById(id).style.height = '200px';
             document.getElementById(id).style.width = '100vw';
@@ -207,7 +243,7 @@ use yii\helpers\Json;
             document.getElementById(id).style.zIndex = '10000';
             document.getElementById(id).style.<?=($widget->isLeft() ? 'left' : 'right')?> = '0';
             document.getElementById(id).style.bottom = '0';
-            document.getElementById(id).innerHTML = '<iframe scrolling="no" id="' + id + '_frame" style="overflow: hidden; box-shadow: none; height: 210px; width: 100%; background: transparent;"  frameborder="0" src="<?=Url::to(['frame/demo', 'id' => $model->default_widget_id], true)?>?mobile=1&channel=' + channel + '&cookie=' + cookie + '" ></iframe>';
+            document.getElementById(id).innerHTML = '<iframe scrolling="no" id="' + id + '_frame" style="overflow: hidden; box-shadow: none; height: 210px; width: 100%; background: transparent;"  frameborder="0" src="<?=Url::to(['frame/prod', 'id' => $model->default_widget_id], true)?>?mobile=1&channel=' + channel + '&cookie=' + cookie + '" ></iframe>';
 
             <?php else: ?>
 
@@ -217,7 +253,7 @@ use yii\helpers\Json;
             document.getElementById(id).style.background = 'rgba(0, 0, 0, 0) none repeat scroll 0% 0%';
             document.getElementById(id).style.zIndex = '10000';
             <?=$widget->positionFrame()?>
-            document.getElementById(id).innerHTML = '<iframe scrolling="no" id="' + id + '_frame" style="overflow: hidden; box-shadow: none; height: 210px; width: 500px; background: transparent;"  frameborder="0" src="<?=Url::to(['frame/demo', 'id' =>  $model->default_widget_id], true)?>?channel=' + channel + '&cookie=' + cookie + '" ></iframe>';
+            document.getElementById(id).innerHTML = '<iframe scrolling="no" id="' + id + '_frame" style="overflow: hidden; box-shadow: none; height: 210px; width: 500px; background: transparent;"  frameborder="0" src="<?=Url::to(['frame/prod', 'id' =>  $model->default_widget_id], true)?>?channel=' + channel + '&cookie=' + cookie + '" ></iframe>';
 
             <?php endif; ?>
 

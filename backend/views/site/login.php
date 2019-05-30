@@ -1,35 +1,58 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
+/* @var $form common\efnify\widgets\ActiveForm */
 /* @var $model \common\models\LoginForm */
 
 use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
+use common\efnify\widgets\ActiveForm;
 
-$this->title = 'Login';
+$this->title = 'Авторизация';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
+<div class="card-content">
+    <!-- title -->
+    <div class="body-1 ui-app__page-content--title border"><?= Html::encode($this->title) ?></div>
 
-    <p>Please fill out the following fields to login:</p>
+    <!-- card body -->
+    <div class="card-body">
 
-    <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
+        <?php $form = ActiveForm::begin([
+            'id' => 'login-form',
 
-                <?= $form->field($model, 'email')->textInput(['autofocus' => true]) ?>
+        ]); ?>
+        <div class="row m-b-5">
 
-                <?= $form->field($model, 'password')->passwordInput() ?>
+            <?= $form->field($model, 'email', [
+                'options' => [
+                    'class'=> 'input-field col s12',
+                ],
+                'template' => "<i class=\"material-icons prefix\">email</i>\n{input}\n{label}\n{error}"
+            ])->textInput(['autofocus' => true]) ?>
 
-                <?= $form->field($model, 'rememberMe')->checkbox() ?>
+            <?= $form->field($model, 'password', [
+                'options' => [
+                    'class'=> 'input-field col s12',
+                ],
+                'template' => "<i class=\"material-icons prefix\">lock_outline</i>\n{input}\n{label}\n{error}"
+            ])->passwordInput() ?>
 
-                <div class="form-group">
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-                </div>
+            <?= $form->field($model, 'rememberMe', [
+                'options' => [
+                    'class'=> 'col s12',
+                ],
+                'template' => "<p>\n <label>{input}\n<span>ЗАПОМНИТЬ МЕНЯ</span> </label>\n </p>"
+            ])->input('checkbox') ?>
 
-            <?php ActiveForm::end(); ?>
+            <div class="input-field col s12">
+
+                <?= Html::submitButton('Войти в аккаут', ['class' => 'btn btn-block waves-effect waves-light', 'name' => 'login-button']) ?>
+            </div>
+
         </div>
+        <?php ActiveForm::end(); ?>
+
     </div>
+
+
 </div>

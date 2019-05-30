@@ -5,9 +5,12 @@
  * Date: 04.12.2018
  * Time: 17:00
  */
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $widget \common\models\WidgetFrame */
+/* @var $visit \common\models\Visit */
+
 
 if ($widget->isLeft())
 {
@@ -19,6 +22,66 @@ else {
     $position_invert = 'left';
 }
 
+if ($visit)
+{
+    $route_view = Url::to(['collector/frame', 'id' =>$visit->id, 'viewed' =>1]);
+    $route_use = Url::to(['collector/frame', 'id' =>$visit->id, 'used' =>1]);
+    $script_widget = <<< JS
+    let check_viewed = false;
+    let use_phone = false;
+    
+    function Viewed() {
+        //console.log('viewed');
+      if (check_viewed===false)
+          {
+              $.get( "$route_view", )
+                    .done(function( jsonr )
+                    {
+                        let result = JSON.parse(jsonr)
+                        if (result['result']===true)
+                            {
+                                check_viewed = true;
+                            }
+                    });
+          }
+    }
+    
+    function UsePhone() {
+      if (use_phone===false)
+          {
+              $.get( "$route_use" )
+                    .done(function( jsonr )
+                    {
+                        let result = JSON.parse(jsonr)
+                        if (result['result']===true)
+                            {
+                                use_phone = true;
+                            }
+                    });
+          }
+    }
+    
+    $("#image_block").mouseover(function() {
+      
+      Viewed();
+    });
+    
+    $("#small_widget").click(function() {
+    
+      Viewed();
+    });
+    
+    // Click on phone
+    $("#usephone").click(function() {
+        
+      UsePhone();
+    });
+
+JS;
+
+    $this->registerJs($script_widget);
+}
+/**/
 $script_desktop = <<< JS
 
 const head_text =  '{$widget->code}';
@@ -195,7 +258,7 @@ else {
             <a target="_parent" id="usephone" class="mobile-phone" href="tel:<?=$widget->phone?>"><?=$widget->phone?></a><br />
             назовите Ваш код и<br />
             получите скидку!<br/>
-            <a class="mobile-logo" href="" target="_blank"><div class="mikro-logo"></div></a>
+            <a class="mobile-logo" href="<?=Yii::$app->params['urlHostWidget']?>" target="_blank"><div class="mikro-logo"></div></a>
         </div>
     </div>
 </div>
@@ -216,7 +279,7 @@ else {
                 <div class="content-opacity" id="content">
                     <span class="icon-warning"></span>Позвоните по телефону<br>
                     <a target="_parent" id="usephone" class="phone" href="tel:<?=$widget->phone?>"><?=$widget->phone?></a>
-                    <br>назовите Ваш код и<br>получите скидку!<br><a class="logo" href="" target="_blank"><div class="mikro-logo"></div></a>
+                    <br>назовите Ваш код и<br>получите скидку!<br><a class="logo" href="<?=Yii::$app->params['urlHostWidget']?>" target="_blank"><div class="mikro-logo"></div></a>
                 </div>
             </div>
         </div>

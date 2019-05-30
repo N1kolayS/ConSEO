@@ -53,6 +53,19 @@ class Visit extends \yii\db\ActiveRecord
     }
 
     /**
+     * @param $cookie
+     * @param $channel_id
+     * @return bool|static
+     */
+    public static function findByCookieAndChannel($cookie, $channel_id)
+    {
+        if (($model=self::findOne(['cookie' => $cookie, 'channel_id' => $channel_id])) !== null)
+            return $model;
+        else
+            return false;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName()
@@ -158,12 +171,10 @@ class Visit extends \yii\db\ActiveRecord
             $visit->url = $url;
             $visit->ip = $ip;
             $visit->browser = $browser;
-            $visit->cookie = self::generateCookie($project_id);
+            $visit->cookie = $cookie;
             $visit->loaded = 1;
             if ($mobile=='1') { $visit->mobile = 1; }
-
             $visit->save();
-
         }
         return $visit;
     }
